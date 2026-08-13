@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AnantRiksh • 250,000 SDSS DR18 Galaxy & Quasar Map</title>
+  <meta name="description" content="Explore 250,000 celestial galaxies, quasars, and helical star creation bands in 3D WebGL with Planck 2018 redshift cosmology." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23040408' stroke='%2300f0ff' stroke-width='4'/><circle cx='50' cy='50' r='22' fill='%23ff0055'/><circle cx='50' cy='50' r='8' fill='%2300f0ff'/></svg>" />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Three.js Import Map -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body class="video-centric-mode">
+  <div id="app">
+    <!-- 3D WebGL Canvas Layer -->
+    <div id="canvas-container"></div>
+
+    <!-- TOP-LEFT MINIMAL BRAND LOGO BADGE -->
+    <div class="brand-watermark" id="brand-watermark">
+      <div class="wm-pulse"></div>
+      <div class="wm-text">
+        <span class="wm-title">ANANT<strong class="cyan">RIKSH</strong></span>
+        <span class="wm-sub">SDSS DR18 • PLANCK 2018</span>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         RIGHT SIDE: PROMINENT 250,000 CELESTIAL COUNTER & TELEMETRY
+         ========================================================================== -->
+    <aside class="right-counter-hud glass-card" id="card-telemetry">
+      <div class="rc-header">
+        <span class="rc-dot"></span>
+        <span class="rc-title">LIVE CELESTIAL TELEMETRY</span>
+        <span class="fps-pill" id="fps-display">60 FPS</span>
+      </div>
+
+      <!-- THE 250,000 PROMINENT NUMBER DISPLAY -->
+      <div class="rc-count-container">
+        <div class="rc-primary-count" id="stat-count">250,000</div>
+        <div class="rc-sub-label">
+          <span class="highlight-cyan">OBJECTS</span> PLOTTED OF <strong>250,000</strong>
+        </div>
+        <div class="rc-progress-track">
+          <div class="rc-progress-bar" id="stat-progress-bar" style="width: 100%"></div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="rc-metrics-grid">
+        <div class="rc-metric-item">
+          <span class="rc-m-label">Galaxies</span>
+          <strong class="rc-m-val gold" id="stat-galaxies">195,000</strong>
+        </div>
+        <div class="rc-metric-item">
+          <span class="rc-m-label">Quasars (QSOs)</span>
+          <strong class="rc-m-val cyan" id="stat-qsos">55,000</strong>
+        </div>
+        <div class="rc-metric-item">
+          <span class="rc-m-label">Redshift (z)</span>
+          <strong class="rc-m-val" id="stat-redshift">z = 0.00 — 7.00</strong>
+        </div>
+        <div class="rc-metric-item">
+          <span class="rc-m-label">Comoving Distance</span>
+          <strong class="rc-m-val" id="stat-distance">8.64 Gpc</strong>
+        </div>
+        <div class="rc-metric-item full-width">
+          <span class="rc-m-label">Cosmic Lookback Time</span>
+          <strong class="rc-m-val pink" id="stat-lookback">12.96 Gyr ago</strong>
+        </div>
+      </div>
+
+      <!-- Micro Quick Action Buttons on Right -->
+      <div class="rc-quick-actions">
+        <button class="rc-btn" id="btn-auto-orbit" title="Toggle Cinematic Auto-Orbit (O)">
+          <span class="icon">🎥</span> Orbit
+        </button>
+        <button class="rc-btn" id="btn-transparent-bg" title="Toggle Alpha Transparent BG (T)">
+          <span class="icon">🌌</span> Alpha BG
+        </button>
+        <button class="rc-btn" id="btn-audio-toggle" title="Toggle Soundtrack: Chanakya by Rishabh Sharma (M)">
+          <span class="icon" id="audio-icon">🔊</span> Music
+        </button>
+        <button class="rc-btn" id="btn-hide-ui" title="Toggle Cinema Video Clean Mode (H)">
+          <span class="icon">👁️</span> Hide UI
+        </button>
+      </div>
+    </aside>
+
+    <!-- ==========================================================================
+         BOTTOM-LEFT CORNER: CONSOLIDATED VIDEO COMMAND DECK
+         ========================================================================== -->
+    <div class="bottom-left-command-deck glass-card" id="card-controller">
+      <!-- Deck Header / Toggle Strip -->
+      <div class="deck-top-strip">
+        <div class="deck-title-group">
+          <span class="deck-icon">🛸</span>
+          <span class="deck-title">Command Deck</span>
+        </div>
+        <div class="deck-strip-actions">
+          <button class="deck-tool-btn" id="btn-toggle-histogram" title="Toggle Redshift Distribution Drawer">
+            <span>📊</span> Histogram
+          </button>
+          <button class="deck-tool-btn" id="btn-fullscreen" title="Cinema Fullscreen (F)">
+            <span>🎬</span> Fullscreen
+          </button>
+          <button class="deck-tool-btn" id="btn-import-csv" title="Import SDSS CSV">
+            <span>📂</span> CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Playback & Stream Timeline Controls -->
+      <div class="deck-playback-row">
+        <div class="deck-btns">
+          <button class="deck-btn primary" id="btn-play-pause" title="Play / Pause Stream (Space)">
+            <span id="play-pause-icon">⏸</span> <span id="play-pause-label">Pause</span>
+          </button>
+          <button class="deck-btn" id="btn-step" title="Step +1 Object">+1</button>
+          <button class="deck-btn" id="btn-reset" title="Reset to Origin (R)">⟲</button>
+        </div>
+
+        <!-- Scrubber -->
+        <div class="deck-scrubber-wrapper">
+          <input type="range" id="slider-scrubber" class="cosmic-slider" min="0" max="1000" value="0" />
+          <span class="scrubber-badge" id="scrubber-pct-label">0.0%</span>
+        </div>
+      </div>
+
+      <!-- Speed & Order Controls -->
+      <div class="deck-controls-grid">
+        <div class="deck-ctrl-item">
+          <label>Speed:</label>
+          <div class="speed-pill-group">
+            <button class="speed-pill" data-speed="0.2">0.2/s</button>
+            <button class="speed-pill" data-speed="100">100/s</button>
+            <button class="speed-pill" data-speed="4500">4.5K/s</button>
+            <button class="speed-pill active" data-speed="25000">25K/s</button>
+            <button class="speed-pill instant" data-speed="Infinity">All</button>
+          </div>
+        </div>
+
+        <div class="deck-ctrl-item">
+          <label>Order:</label>
+          <select id="select-order" class="glass-select">
+            <option value="redshift">Cosmic Time (Earth Outwards)</option>
+            <option value="scan">SDSS Sky Scan Sweep</option>
+            <option value="filaments">Cosmic Web Filaments</option>
+            <option value="random">Random Discovery</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Cosmic Landmarks Quick Travel Bar -->
+      <div class="deck-landmarks-row">
+        <span class="landmarks-label">Landmarks:</span>
+        <div class="landmark-pills">
+          <button class="landmark-pill" data-landmark="bootes" title="Boötes Void ('The Great Nothing')">🕳️ Boötes</button>
+          <button class="landmark-pill" data-landmark="sloan_wall" title="Sloan Great Wall">🧱 Sloan Wall</button>
+          <button class="landmark-pill" data-landmark="quasar_dawn" title="Quasar Dawn Epoch (z=7)">🌟 Quasar Dawn</button>
+          <button class="landmark-pill" data-landmark="earth" title="Earth / Milky Way Origin">🔭 Earth</button>
+          <button class="landmark-pill active" data-landmark="overview" title="Survey Wedge Overview">🦋 Overview</button>
+        </div>
+      </div>
+
+      <!-- COLLAPSIBLE REDSHIFT HISTOGRAM DRAWER (Inside Single Corner Deck) -->
+      <div class="deck-histogram-drawer hidden" id="card-histogram">
+        <div class="hist-drawer-header">
+          <span>Redshift Distribution Histogram</span>
+          <div class="hist-slice-row">
+            <label>Slice z:</label>
+            <input type="number" id="input-min-z" class="glass-num-input" step="0.01" min="0.00" max="6.9" value="0.00" />
+            <span>—</span>
+            <input type="number" id="input-max-z" class="glass-num-input" step="0.01" min="0.05" max="7.0" value="0.30" />
+            <button class="deck-btn tiny primary" id="btn-apply-filter">Slice</button>
+            <button class="deck-btn tiny" id="btn-reset-filter">Full (z=7)</button>
+          </div>
+        </div>
+        <div class="hist-svg-wrapper">
+          <svg id="histogram-svg" viewBox="0 0 400 90" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINIMAL SCREEN RECORDING DOCK (FOR CLEAN VIDEO CAPTURE) -->
+    <div class="recording-dock glass-card hidden" id="recording-dock">
+      <div class="rec-status">
+        <span class="rec-dot"></span>
+        <span>CINEMA VIDEO MODE</span>
+      </div>
+      <button class="dock-btn" id="dock-play-pause" title="Play/Pause (Space)">⏸</button>
+      <button class="dock-btn" id="dock-orbit" title="Toggle Auto-Orbit (O)">🎥 Orbit</button>
+      <button class="dock-btn" id="dock-transparent" title="Toggle Transparent Background (T)">🌌 Alpha BG</button>
+      <span class="dock-count" id="dock-count">250,000</span>
+      <button class="dock-btn exit-btn" id="dock-exit" title="Restore UI Deck (H)">👁️ Show Deck [H]</button>
+    </div>
+
+    <!-- OBJECT INSPECTION & SPECTRUM MODAL -->
+    <div class="modal-backdrop hidden" id="spectrum-modal">
+      <div class="glass-card spectrum-box">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="badge-tag" id="spec-type-tag">GALAXY</span>
+            <h2 id="spec-target-name">SDSS J124503.2+142205</h2>
+          </div>
+          <button class="modal-close-btn" id="btn-close-spectrum">✕</button>
+        </div>
+
+        <div class="spectrum-content">
+          <div class="spec-metrics-grid">
+            <div class="spec-metric">
+              <span class="sm-label">Redshift z</span>
+              <strong class="sm-val cyan" id="spec-z">z = 0.0842</strong>
+            </div>
+            <div class="spec-metric">
+              <span class="sm-label">Lookback Time</span>
+              <strong class="sm-val gold" id="spec-lookback">1.12 Gyr ago</strong>
+            </div>
+            <div class="spec-metric">
+              <span class="sm-label">Comoving Distance</span>
+              <strong class="sm-val" id="spec-dist">365.4 Mpc</strong>
+            </div>
+            <div class="spec-metric">
+              <span class="sm-label">Spectral Class</span>
+              <strong class="sm-val violet" id="spec-class">Early Spiral (Sbc)</strong>
+            </div>
+            <div class="spec-metric">
+              <span class="sm-label">Effective Temp</span>
+              <strong class="sm-val" id="spec-temp">4,850 K</strong>
+            </div>
+            <div class="spec-metric">
+              <span class="sm-label">Apparent Mag (r)</span>
+              <strong class="sm-val" id="spec-mag">15.42</strong>
+            </div>
+          </div>
+
+          <div class="spec-chart-wrapper">
+            <div class="chart-header">
+              <span>Observed Optical Flux Spectrum (380 nm — 920 nm)</span>
+              <span class="spec-legend">Planck Law + Emission Line Profile</span>
+            </div>
+            <svg id="spectrum-svg" viewBox="0 0 600 170" preserveAspectRatio="none"></svg>
+          </div>
+
+          <div class="emission-lines-list" id="spec-lines-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CSV IMPORT MODAL -->
+    <div class="modal-backdrop hidden" id="csv-modal">
+      <div class="glass-card csv-box">
+        <div class="modal-header">
+          <h2>Import Custom SDSS SQL Query CSV</h2>
+          <button class="modal-close-btn" id="btn-close-csv">✕</button>
+        </div>
+        <p class="modal-desc">
+          Paste SDSS DR18 CSV export below. Expected columns: <code>ra</code>, <code>dec</code>, <code>z</code>, and optionally <code>class</code> ('GALAXY' or 'QSO').
+        </p>
+        <textarea id="csv-textarea" class="glass-textarea" placeholder="ra,dec,z,class&#10;145.2,12.3,0.045,GALAXY&#10;218.1,46.2,0.056,GALAXY&#10;180.5,25.4,4.820,QSO..."></textarea>
+        <div class="modal-footer">
+          <button class="deck-btn primary" id="btn-confirm-import">Parse & Visualize</button>
+          <button class="deck-btn" id="btn-cancel-import">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
